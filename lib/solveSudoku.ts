@@ -1,26 +1,62 @@
 export function solveSudoku(board: number[][]): boolean {
-  const isValid = (row: number, col: number, num: number): boolean => {
-    for (let i = 0; i < 9; i++) {
-      if (board[row][i] === num || board[i][col] === num) return false;
-      const boxRow = 3 * Math.floor(row / 3) + Math.floor(i / 3);
-      const boxCol = 3 * Math.floor(col / 3) + (i % 3);
-      if (board[boxRow][boxCol] === num) return false;
+  const rowHas = (row: number, num: number): boolean =>
+    board[row].includes(num);
+
+  const colHas = (col: number, num: number): boolean =>
+    board.some((r) => r[col] === num);
+
+  const boxHas = (
+    startRow: number,
+    startCol: number,
+    num: number
+  ): boolean => {
+    for (let r = 0; r < 3; r++) {
+      for (let c = 0; c < 3; c++) {
+        if (board[startRow + r][startCol + c] === num) return true;
+      }
     }
-    return true;
+    return false;
   };
 
-  for (let row = 0; row < 9; row++) {
-    for (let col = 0; col < 9; col++) {
-      if (board[row][col] === 0) {
-        for (let num = 1; num <= 9; num++) {
-          if (isValid(row, col, num)) {
-            board[row][col] = num;
-            if (solveSudoku(board)) return true;
-            board[row][col] = 0;
+  const possiblePositions = (
+    num: number,
+    startRow: number,
+    startCol: number
+  ): [number, number][] => {
+    const positions: [number, number][] = [];
+    for (let r = 0; r < 3; r++) {
+      for (let c = 0; c < 3; c++) {
+        const row = startRow + r;
+        const col = startCol + c;
+        if (board[row][col] !== 0) continue;
+        if (rowHas(row, num) || colHas(col, num)) continue;
+        positions.push([row, col]);
+      }
+    }
+    return positions;
+  };
+
+  let changed = true;
+  while (changed) {
+    changed = false;
+    for (let num = 1; num <= 9; num++) {
+      for (let boxRow = 0; boxRow < 9; boxRow += 3) {
+        for (let boxCol = 0; boxCol < 9; boxCol += 3) {
+          if (boxHas(boxRow, boxCol, num)) continue;
+          const positions = possiblePositions(num, boxRow, boxCol);
+          if (positions.length === 1) {
+            const [r, c] = positions[0];
+            board[r][c] = num;
+            changed = true;
           }
         }
-        return false;
       }
+    }
+  }
+
+  for (let r = 0; r < 9; r++) {
+    for (let c = 0; c < 9; c++) {
+      if (board[r][c] === 0) return false;
     }
   }
   return true;
