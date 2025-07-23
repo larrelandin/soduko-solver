@@ -32,8 +32,10 @@ export default function Home() {
     height: "40px",
     textAlign: "center" as const,
     border: "1px solid #000",
-    borderRightWidth: col === 2 || col === 5 ? "3px" : "1px",
-    borderBottomWidth: row === 2 || row === 5 ? "3px" : "1px",
+    borderLeftWidth: col === 3 || col === 6 || col === 0 ? "3px" : "1px",
+    borderTopWidth: row === 3 || row === 6 || row === 0 ? "3px" : "1px",
+    borderRightWidth: col === 8 ? "3px" : "1px",
+    borderBottomWidth: row === 8 ? "3px" : "1px",
   });
 
   return (
