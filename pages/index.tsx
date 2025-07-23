@@ -5,9 +5,12 @@ export default function Home() {
   const [board, setBoard] = useState<number[][]>(
     Array.from({ length: 9 }, () => Array(9).fill(0))
   );
+  const [initialBoard, setInitialBoard] = useState<boolean[][]>(
+    Array.from({ length: 9 }, () => Array(9).fill(false))
+  );
 
   const handleTest = () => {
-    setBoard([
+    const test = [
       [0, 2, 0, 0, 0, 3, 0, 0, 0],
       [8, 9, 0, 0, 0, 1, 0, 0, 0],
       [0, 0, 3, 0, 0, 8, 6, 1, 0],
@@ -17,7 +20,9 @@ export default function Home() {
       [0, 0, 7, 0, 0, 0, 0, 0, 0],
       [0, 0, 5, 0, 0, 0, 2, 0, 9],
       [0, 0, 9, 3, 0, 0, 0, 0, 0],
-    ]);
+    ];
+    setBoard(test);
+    setInitialBoard(test.map((row) => row.map((v) => v !== 0)));
   };
 
   const handleSolve = () => {
@@ -31,6 +36,9 @@ export default function Home() {
       const updated = board.map((r) => [...r]);
       updated[row][col] = 0;
       setBoard(updated);
+      const initialCopy = initialBoard.map((r) => [...r]);
+      initialCopy[row][col] = false;
+      setInitialBoard(initialCopy);
       return;
     }
 
@@ -38,6 +46,9 @@ export default function Home() {
       const updated = board.map((r) => [...r]);
       updated[row][col] = parseInt(value, 10);
       setBoard(updated);
+      const initialCopy = initialBoard.map((r) => [...r]);
+      initialCopy[row][col] = true;
+      setInitialBoard(initialCopy);
     }
   };
 
@@ -45,6 +56,7 @@ export default function Home() {
     width: "40px",
     height: "40px",
     textAlign: "center" as const,
+    fontWeight: initialBoard[row][col] ? "bold" : "normal",
     border: "1px solid #000",
     borderLeftWidth: col === 3 || col === 6 || col === 0 ? "3px" : "1px",
     borderTopWidth: row === 3 || row === 6 || row === 0 ? "3px" : "1px",
