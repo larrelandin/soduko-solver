@@ -36,9 +36,6 @@ export default function Home() {
       const updated = board.map((r) => [...r]);
       updated[row][col] = 0;
       setBoard(updated);
-      const initialCopy = initialBoard.map((r) => [...r]);
-      initialCopy[row][col] = false;
-      setInitialBoard(initialCopy);
       return;
     }
 
@@ -46,17 +43,16 @@ export default function Home() {
       const updated = board.map((r) => [...r]);
       updated[row][col] = parseInt(value, 10);
       setBoard(updated);
-      const initialCopy = initialBoard.map((r) => [...r]);
-      initialCopy[row][col] = true;
-      setInitialBoard(initialCopy);
     }
   };
 
-  const getCellStyle = (row: number, col: number) => ({
+  const getCellStyle = (row: number, col: number): React.CSSProperties => ({
     width: "40px",
     height: "40px",
     textAlign: "center" as const,
     fontWeight: initialBoard[row][col] ? "bold" : "normal",
+    fontSize: initialBoard[row][col] ? "20px" : "16px",
+    color: initialBoard[row][col] ? "#555" : "#000",
     border: "1px solid #000",
     borderLeftWidth: col === 3 || col === 6 || col === 0 ? "3px" : "1px",
     borderTopWidth: row === 3 || row === 6 || row === 0 ? "3px" : "1px",
