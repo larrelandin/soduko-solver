@@ -5,55 +5,64 @@ export function solveSudoku(board: number[][]): boolean {
   const colHas = (col: number, num: number): boolean =>
     board.some((r) => r[col] === num);
 
-  const boxHas = (
-    startRow: number,
-    startCol: number,
-    num: number
-  ): boolean => {
-    for (let r = 0; r < 3; r++) {
-      for (let c = 0; c < 3; c++) {
-        if (board[startRow + r][startCol + c] === num) return true;
-      }
+  /**
+   * Return all empty cells in the given row where the column does not
+   * already contain the digit.
+   */
+  const rowCandidates = (row: number, num: number): [number, number][] => {
+    const candidates: [number, number][] = [];
+    for (let col = 0; col < 9; col++) {
+      if (board[row][col] !== 0) continue;
+      if (colHas(col, num)) continue;
+      candidates.push([row, col]);
     }
-    return false;
+    return candidates;
   };
 
-  const possiblePositions = (
-    num: number,
-    startRow: number,
-    startCol: number
-  ): [number, number][] => {
-    const positions: [number, number][] = [];
-    for (let r = 0; r < 3; r++) {
-      for (let c = 0; c < 3; c++) {
-        const row = startRow + r;
-        const col = startCol + c;
-        if (board[row][col] !== 0) continue;
-        if (rowHas(row, num) || colHas(col, num)) continue;
-        positions.push([row, col]);
-      }
+  /**
+   * Return all empty cells in the given column where the row does not
+   * already contain the digit.
+   */
+  const columnCandidates = (col: number, num: number): [number, number][] => {
+    const candidates: [number, number][] = [];
+    for (let row = 0; row < 9; row++) {
+      if (board[row][col] !== 0) continue;
+      if (rowHas(row, num)) continue;
+      candidates.push([row, col]);
     }
-    return positions;
+    return candidates;
   };
 
   let changed = true;
   while (changed) {
     changed = false;
+
+    // Try placing each digit in rows where it fits in exactly one column
     for (let num = 1; num <= 9; num++) {
-      for (let boxRow = 0; boxRow < 9; boxRow += 3) {
-        for (let boxCol = 0; boxCol < 9; boxCol += 3) {
-          if (boxHas(boxRow, boxCol, num)) continue;
-          const positions = possiblePositions(num, boxRow, boxCol);
-          if (positions.length === 1) {
-            const [r, c] = positions[0];
-            board[r][c] = num;
-            changed = true;
-          }
+      for (let row = 0; row < 9; row++) {
+        if (rowHas(row, num)) continue;
+        const positions = rowCandidates(row, num);
+        if (positions.length === 1) {
+          const [, col] = positions[0];
+          board[row][col] = num;
+          changed = true;
+        }
+      }
+
+      // Then check each column for a single possible row
+      for (let col = 0; col < 9; col++) {
+        if (colHas(col, num)) continue;
+        const positions = columnCandidates(col, num);
+        if (positions.length === 1) {
+          const [row] = positions[0];
+          board[row][col] = num;
+          changed = true;
         }
       }
     }
   }
 
+  // After no more placements can be made, verify there are no empty cells
   for (let r = 0; r < 9; r++) {
     for (let c = 0; c < 9; c++) {
       if (board[r][c] === 0) return false;
